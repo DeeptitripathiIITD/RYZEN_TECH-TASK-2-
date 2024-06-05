@@ -1,0 +1,64 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// Define a struct to represent a sample
+struct Sample {
+    vector<double> features;
+    int label;
+};
+
+// Function to load the dataset from a CSV file
+vector<Sample> loadDataset(const string& filename) {
+    vector<Sample> dataset;
+    ifstream file(filename);
+    string line;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        Sample sample;
+        string value;
+
+        while (getline(ss, value, ',')) {
+            if (ss.peek() == '\n') break; // Skip the label
+            sample.features.push_back(stod(value));
+        }
+
+        sample.label = stoi(value); // Last value is the label
+        dataset.push_back(sample);
+    }
+
+    return dataset;
+}
+
+// Decision tree classifier
+int classify(const vector<double>& sample, const vector<Sample>& dataset) {
+    // Very simple decision rule: If the mean of features is greater than 0.5, classify as malignant (1), else benign (0).
+    double sum = 0;
+    for (double feature : sample) {
+        sum += feature;
+    }
+    double mean = sum / sample.size();
+
+    return (mean > 0.5) ? 1 : 0;
+}
+
+int main() {
+    // Load the dataset
+    vector<Sample> dataset = loadDataset("dataset.csv");
+
+    // Example new sample (replace with your own sample)
+    vector<double> newSample = {0.2, 0.3, 0.4, 0.1};
+
+    // Classify the new sample
+    int predictedLabel = classify(newSample, dataset);
+
+    // Output the predicted label
+    cout << "Predicted label: " << predictedLabel << endl;
+
+    return 0;
+}
